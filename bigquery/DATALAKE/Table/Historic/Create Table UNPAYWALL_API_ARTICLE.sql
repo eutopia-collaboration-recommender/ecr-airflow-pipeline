@@ -1,0 +1,9 @@
+CREATE OR REPLACE TABLE `collaboration-recommender`.AIRFLOW.UNPAYWALL_API_ARTICLE
+(
+    DOI    STRING,
+    JSON STRING
+);
+
+
+
+

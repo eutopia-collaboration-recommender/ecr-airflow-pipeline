@@ -1,0 +1,5 @@
+WITH REF_UNPAYWALL_API_ARTICLE AS (SELECT * FROM {{ source('DATALAKE', 'UNPAYWALL_API_ARTICLE') }})
+SELECT DOI                                                                        AS ARTICLE_DOI,
+       IFNULL(JSON_EXTRACT_SCALAR(JSON, '$.best_oa_location.url_for_pdf'), 'n/a') AS ARTICLE_PDF_URL,
+       IFNULL(CAST(JSON_EXTRACT_SCALAR(JSON, '$.is_oa') AS BOOLEAN), FALSE)      AS IS_ARTICLE_OPEN_ACCESS
+FROM REF_UNPAYWALL_API_ARTICLE

@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: ANALYTICS
+    description: ""
+    database: collaboration-recommender
+    schema: ANALYTICS
+    tables:
+      - name: ARTICLE_TOPIC
+        description: ""
+      - name: COLLABORATION_NOVELTY_INDEX
+        description: ""
+      - name: COLLABORATION_NOVELTY_METADATA
+        description: ""
+      - name: ARTICLE_LANGUAGE
+        description: ""
+      - name: TEXT_EMBEDDING_ARTICLE
+        description: ""

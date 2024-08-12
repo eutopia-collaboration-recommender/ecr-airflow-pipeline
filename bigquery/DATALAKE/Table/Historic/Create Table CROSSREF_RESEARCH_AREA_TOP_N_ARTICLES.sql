@@ -1,0 +1,7 @@
+CREATE OR REPLACE TABLE `collaboration-recommender`.AIRFLOW.CROSSREF_RESEARCH_AREA_TOP_N_ARTICLES
+(
+    RESEARCH_AREA_CODE STRING,
+    DOI                STRING,
+    JSON               STRING
+);
+

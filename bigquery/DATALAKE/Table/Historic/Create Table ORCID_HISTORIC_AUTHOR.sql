@@ -1,0 +1,6 @@
+CREATE OR REPLACE TABLE `collaboration-recommender`.AIRFLOW.ORCID_HISTORIC_AUTHOR
+(
+    ORCID_ID STRING,
+    JSON     STRING
+);
+

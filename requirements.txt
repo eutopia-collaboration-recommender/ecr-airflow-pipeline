@@ -1,0 +1,12 @@
+db-dtypes==1.2.0
+google-cloud-bigquery==3.25.0
+google-cloud-bigquery-storage==2.25.0
+google-cloud-secret-manager==2.20.2
+google-cloud-storage==2.18.0
+pandas==2.2.2
+pyarrow==17.0.0
+python-dotenv==1.0.1
+pytrends==4.9.2
+backoff==2.2.1
+xmltodict==0.13.0
+dbt-bigquery==1.8.2
