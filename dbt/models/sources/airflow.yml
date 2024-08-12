@@ -1,22 +1,22 @@
 version: 2
 
 sources:
-  - name: DATALAKE
+  - name: AIRFLOW
     description: ""
     database: collaboration-recommender
-    schema: DATALAKE
+    schema: AIRFLOW
     tables:
       - name: CROSSREF_HISTORIC_ARTICLE
         description: "Data from Crossref for historic articles."
-      - name: CROSSREF_HISTORIC_ARTICLE_EUTOPIA
-        description: "Data from Crossref for historic articles with EUTOPIA institutions."
+      - name: CROSSREF_ARTICLE_EUTOPIA
+        description: "Data from Crossref for articles with EUTOPIA institutions."
       - name: ORCID_HISTORIC_AUTHOR
         description: "Data from ORCID for historic authors."
       - name: ORCID_API_AUTHOR
         description: "Data from ORCID API for authors."
-      - name: CERIF_RESEARCH_TOPIC
+      - name: CERIF_RESEARCH_AREA
         description: "Data from CERIF for research topics."
-      - name: CERIF_RESEARCH_TOPIC_TOP_N_ARTICLES
+      - name: CROSSREF_RESEARCH_AREA_TOP_N_ARTICLES
         description: "Data from Crossref for top N articles for CERIF research topics."
       - name: EUTOPIA_INSTITUTION
         description: "Data from EUTOPIA for institutions."

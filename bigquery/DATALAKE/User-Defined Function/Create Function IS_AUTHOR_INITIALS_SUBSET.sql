@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION
-    `collaboration-recommender`.DATALAKE.IS_AUTHOR_INITIALS_SUBSET(name1 STRING, name2 STRING)
+    `collaboration-recommender`.AIRFLOW.IS_AUTHOR_INITIALS_SUBSET(name1 STRING, name2 STRING)
     RETURNS BOOL
     LANGUAGE js AS """
   function getInitials(name) {

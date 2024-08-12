@@ -30,21 +30,21 @@ WITH REF_STG_CROSSREF_HISTORIC_ARTICLE AS (SELECT *
                      , SAFE_CAST(JSON_EXTRACT_SCALAR(SOURCE_JSON, '$.is-referenced-by-count') AS INT64) AS IS_REFERENCED_BY_COUNT
                      -- Select minimum date from list
                      , LEAST(
-                 DATALAKE.UDF_TO_DATE_FROM_CROSSREF_DATE_PARTS(
+                 AIRFLOW.UDF_TO_DATE_FROM_CROSSREF_DATE_PARTS(
                          PARSE_JSON(JSON_EXTRACT(SOURCE_JSON, '$.posted')))
-             , DATALAKE.UDF_TO_DATE_FROM_CROSSREF_DATE_PARTS(
+             , AIRFLOW.UDF_TO_DATE_FROM_CROSSREF_DATE_PARTS(
                          PARSE_JSON(JSON_EXTRACT(SOURCE_JSON, '$.accepted')))
-             , DATALAKE.UDF_TO_DATE_FROM_CROSSREF_DATE_PARTS(
+             , AIRFLOW.UDF_TO_DATE_FROM_CROSSREF_DATE_PARTS(
                          PARSE_JSON(JSON_EXTRACT(SOURCE_JSON, '$.submitted')))
-             , DATALAKE.UDF_TO_DATE_FROM_CROSSREF_DATE_PARTS(
+             , AIRFLOW.UDF_TO_DATE_FROM_CROSSREF_DATE_PARTS(
                          PARSE_JSON(JSON_EXTRACT(SOURCE_JSON, '$.reviewed')))
-             , DATALAKE.UDF_TO_DATE_FROM_CROSSREF_DATE_PARTS(
+             , AIRFLOW.UDF_TO_DATE_FROM_CROSSREF_DATE_PARTS(
                          PARSE_JSON(JSON_EXTRACT(SOURCE_JSON, '$.assertion')))
-             , DATALAKE.UDF_TO_DATE_FROM_CROSSREF_DATE_PARTS(
+             , AIRFLOW.UDF_TO_DATE_FROM_CROSSREF_DATE_PARTS(
                          PARSE_JSON(JSON_EXTRACT(SOURCE_JSON, '$.published')))
-             , DATALAKE.UDF_TO_DATE_FROM_CROSSREF_DATE_PARTS(
+             , AIRFLOW.UDF_TO_DATE_FROM_CROSSREF_DATE_PARTS(
                          PARSE_JSON(JSON_EXTRACT(SOURCE_JSON, '$.indexed'))))                           AS ARTICLE_EST_PUBLISH_DT
-                     , DATALAKE.UDF_TO_DATE_FROM_CROSSREF_DATE_PARTS(
+                     , AIRFLOW.UDF_TO_DATE_FROM_CROSSREF_DATE_PARTS(
                  PARSE_JSON(JSON_EXTRACT(SOURCE_JSON, '$.indexed')))                                    AS INDEXED_DT
                 FROM REF_STG_CROSSREF_HISTORIC_ARTICLE
                 WHERE SOURCE_JSON IS NOT NULL)

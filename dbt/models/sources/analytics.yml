@@ -6,7 +6,7 @@ sources:
     database: collaboration-recommender
     schema: ANALYTICS
     tables:
-      - name: ARTICLE_TOPIC
+      - name: ARTICLE_RESEARCH_AREA
         description: ""
       - name: COLLABORATION_NOVELTY_INDEX
         description: ""

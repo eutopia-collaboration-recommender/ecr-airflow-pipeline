@@ -1,0 +1,39 @@
+version: 2
+
+models:
+  - name: FCT_AUTHOR_COLLABORATIVENESS
+    description: "This fact table contains information about the collaborativeness of authors trying to show how collaborative an author is compared to other authors."
+    columns:
+      - name: AUTHOR_SID
+        description: "A unique identifier for the author from DIM_ARTICLE."
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              to: ref('DIM_AUTHOR')
+              field: AUTHOR_SID
+      - name: PUBLICATION_COUNT
+        description: "The number of publications by the author."
+        tests:
+          - not_null
+      - name: EXTERNAL_COLLABORATION_COUNT
+        description: "The number of external collaborations by the author."
+        tests:
+          - not_null
+      - name: AUTHOR_COLLABORATION_RATE
+        description: "The rate of external collaborations by the author, calculated as the number of external collaborations divided by the number of publications."
+        tests:
+          - not_null
+      - name: AUTHOR_COLLABORATION_RATE_PERCENTILE
+        description: "The percentile of the author's collaboration rate, which can be used to see how the author's collaboration rate compares to other authors."
+        tests:
+          - not_null
+      - name: IS_AUTHOR_MORE_COLLABORATIVE
+        description: "A flag indicating whether the author is more collaborative than the average author. This flag is derived from the author's collaboration rate and the average collaboration rate using a Beta distribution posterior."
+        tests:
+          - not_null
+      - name: PK_AUTHOR_COLLABORATIVENESS
+        description: "The primary key of the author collaborativeness fact. MD5 hash of the author SID."
+        tests:
+          - not_null
+          - unique

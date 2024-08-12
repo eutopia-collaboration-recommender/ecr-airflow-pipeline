@@ -1,7 +1,7 @@
 WITH SOURCE_TABLE
-    AS (SELECT FILEPATH,
+    AS (SELECT ORCID_ID,
                JSON
-        FROM {{ source('DATALAKE', 'ORCID_HISTORIC_AUTHOR') }})
+        FROM {{ source('AIRFLOW', 'ORCID_HISTORIC_AUTHOR') }})
    , ARTICLE_JSON
     AS (SELECT JSON_EXTRACT_SCALAR(JSON, '$.record:record.common:orcid-identifier.common:path') AS ORCID_ID
              , IFNULL(WORK_SUMMARY, JSON_EXTRACT(WORK, '$.work:work-summary'))                  AS WORK_SUMMARY_JSON
@@ -25,7 +25,7 @@ WITH SOURCE_TABLE
     AS (SELECT ORCID_ID                                                                                               AS MEMBER_ORCID_ID
              , CAST(CAST(JSON_EXTRACT_SCALAR(WORK_SUMMARY_JSON, '$.common:last-modified-date') AS TIMESTAMP) AS DATE) AS ARTICLE_LAST_MODIFIED_DT
              , LOWER(JSON_EXTRACT_SCALAR(EXTERNAL_ID_JSON,
-                                   '$.common:external-id-value'))                                                      AS ARTICLE_DOI
+                                         '$.common:external-id-value'))                                               AS ARTICLE_DOI
              , IFNULL(JSON_EXTRACT_SCALAR(WORK_SUMMARY_JSON, '$.work:title.translated-title'),
                       JSON_EXTRACT_SCALAR(WORK_SUMMARY_JSON, '$.work:title.common:title'))                            AS ARTICLE_TITLE
              , JSON_EXTRACT_SCALAR(WORK_SUMMARY_JSON,

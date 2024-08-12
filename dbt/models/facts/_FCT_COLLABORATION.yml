@@ -1,0 +1,118 @@
+version: 2
+
+models:
+  - name: FCT_COLLABORATION
+    description: "This fact table contains information about the collaborations between authors and institutions. It includes different types of collaborations, such as internal, external, and EUTOPIA collaborations, and flags indicating whether the collaboration is new for the author or institution."
+    columns:
+      - name: ARTICLE_SID
+        description: "A unique identifier for the article from DIM_ARTICLE."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('DIM_ARTICLE')
+              field: ARTICLE_SID
+      - name: AUTHOR_SID
+        description: "A unique identifier for the author from DIM_AUTHOR."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('DIM_AUTHOR')
+              field: AUTHOR_SID
+      - name: RESEARCH_AREA_SID
+        description: "A unique identifier for the research topic from DIM_RESEARCH_AREA."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('DIM_RESEARCH_AREA')
+              field: RESEARCH_AREA_SID
+      - name: INSTITUTION_SID
+        description: "A unique identifier for the institution from DIM_INSTITUTION."
+        tests:
+          - not_null
+          - accepted_values: { values: [ 'CY',
+                                         'GU',
+                                         'OTHER',
+                                         'TU_DRESDEN',
+                                         'UBBCLUJ',
+                                         'UNI_LJ',
+                                         'UNIVE',
+                                         'UNL',
+                                         'UPF',
+                                         'VUB',
+                                         'WARWICK',
+                                         'n/a'
+          ] }
+          - relationships:
+              to: ref('DIM_INSTITUTION')
+              field: INSTITUTION_SID
+      - name: COLLABORATION_TYPE_SID
+        description: "A unique identifier for the collaboration type from DIM_COLLABORATION_TYPE"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('DIM_COLLABORATION_TYPE')
+              field: COLLABORATION_TYPE_SID
+      - name: AUTHOR_EXPERIENCE_SID
+        description: "A unique identifier for the author experience from DIM_AUTHOR_EXPERIENCE"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('DIM_AUTHOR_EXPERIENCE')
+              field: AUTHOR_EXPERIENCE_SID
+      - name: ARTICLE_PUBLICATION_DT
+        description: "The publication date of the article. We build a date from the year, month, and day data fields and default to the first day of the month if the day is not provided and the first day of the year if the month is not provided."
+        tests:
+          - not_null
+      - name: IS_SOLE_AUTHOR_PUBLICATION
+        description: "A flag indicating whether the author is the sole author of the publication."
+        tests:
+          - not_null
+      - name: IS_INTERNAL_COLLABORATION
+        description: "A flag indicating whether the collaboration is internal."
+        tests:
+          - not_null
+      - name: IS_EXTERNAL_COLLABORATION
+        description: "A flag indicating whether the collaboration is external."
+        tests:
+          - not_null
+      - name: IS_EUTOPIAN_COLLABORATION
+        description: "A flag indicating whether the collaboration is from EUTOPIA institutions."
+        tests:
+          - not_null
+      - name: IS_EUTOPIAN_PUBLICATION
+        description: "A flag indicating whether the publication is from EUTOPIA institutions."
+        tests:
+          - not_null
+      - name: IS_NEW_AUTHOR_COLLABORATION
+        description: "A flag indicating whether the collaboration is a new collaboration for the given author, where we count a collaboration as a new collaboration if the given author did not yet collaborate with the exact same set of authors. This means that if the given author did not yet collaborate with at least one of the authors in the collaboration, the collaboration is considered new."
+        tests:
+          - not_null
+      - name: IS_NEW_INSTITUTION_COLLABORATION
+        description: "A flag indicating whether the collaboration is a new collaboration for the given institution, where we count a collaboration as a new collaboration if there exists a pair of institutions whose authors did not yet collaborate in any possible combination."
+        tests:
+          - not_null
+      - name: IS_ARTICLE_RELEVANT
+        description: "A flag indicating if the article is written in English, has sufficient text for embedding and is affiliated with EUTOPIA institution."
+        tests:
+          - not_null
+      - name: IS_FIRST_AUTHOR
+        description: "A flag indicating whether the author is the first author of the publication. Calculated as first author in the array of authors is article metadata."
+        tests:
+          - not_null
+      - name: PK_COLLABORATION
+        description: "The primary key of the collaboration fact. MD5 hash of the article SID, author SID and institution SID."
+        tests:
+          - not_null
+          - unique
+      - name: AUTHOR_CITATION_COUNT
+        description: "The number of citations for the author."
+        tests:
+          - not_null
+      - name: ARTICLE_CITATION_COUNT
+        description: "The number of citations for the article. We only count citations for the first author since we do not want to double count citations for the same article."
+        tests:
+          - not_null
+      - name: INSTITUTION_CITATION_COUNT
+        description: "The number of citations for the institution. We only count citations for the first author per institution since we do not want to double count citations for the same article."
+        tests:
+          - not_null

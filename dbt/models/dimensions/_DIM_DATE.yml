@@ -1,0 +1,43 @@
+version: 2
+
+models:
+  - name: DIM_DATE
+    description: "The date dimension table."
+    columns:
+      - name: DATE
+        description: "The date in the format YYYY-MM-DD."
+        tests:
+          - not_null
+          - unique
+      - name: YEAR
+        description: "The year."
+        tests:
+          - not_null
+      - name: YEAR_MONTH
+        description: "The year and month (3 digit month)."
+        tests:
+          - not_null
+      - name: YEAR_MONTH_NAME
+        description: "The year and month (long month name)."
+        tests:
+          - not_null
+      - name: YEAR_MONTH_NO
+        description: "The year and month (month as a number)."
+        tests:
+          - not_null
+      - name: YEAR_MONTH_NUMBER
+        description: "The year and month (numeric, for sorting)."
+        tests:
+          - not_null
+      - name: YEAR_WEEK_NAME
+        description: "The year and week (long week name, e.g. W1)."
+        tests:
+          - not_null
+      - name: YEAR_WEEK
+        description: "The year and week (week as a number)."
+        tests:
+          - not_null
+      - name: YEAR_WEEK_NUMBER
+        description: "The year and week (numeric, for sorting)."
+        tests:
+          - not_null

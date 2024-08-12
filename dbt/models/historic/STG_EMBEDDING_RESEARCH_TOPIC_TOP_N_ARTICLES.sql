@@ -1,8 +1,0 @@
-WITH REF_STG_CERIF_RESEARCH_TOPIC_TOP_N_ARTICLES AS (SELECT * FROM {{ ref('STG_CERIF_RESEARCH_TOPIC_TOP_N_ARTICLES') }})
-SELECT DISTINCT CERIF_RESEARCH_TOPIC_CODE AS RESEARCH_TOPIC_CODE,
-                ARTICLE_DOI,
-                CONCAT('query:',
-                       '\nTitle:', IFNULL(ARTICLE_TITLE, '/'),
-                       '\nAbstract:', IFNULL(ARTICLE_ABSTRACT, '/')
-                )                         AS EMBEDDING_INPUT
-FROM REF_STG_CERIF_RESEARCH_TOPIC_TOP_N_ARTICLES

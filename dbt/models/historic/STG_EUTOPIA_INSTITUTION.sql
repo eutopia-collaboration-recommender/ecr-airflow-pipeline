@@ -1,5 +1,5 @@
 WITH REF_STG_EUTOPIA_INSTITUTION AS (SELECT *
-                                     FROM {{ source('DATALAKE', 'EUTOPIA_INSTITUTION') }})
+                                     FROM {{ source('AIRFLOW', 'EUTOPIA_INSTITUTION') }})
 SELECT INSTITUTION_SID,
        INSTITUTION_NAME,
        INSTITUTION_PRETTY_NAME,

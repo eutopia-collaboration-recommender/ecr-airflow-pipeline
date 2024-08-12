@@ -1,0 +1,17 @@
+WITH DATE_GENERATOR AS (SELECT DATE_ADD('1970-01-01', INTERVAL day_offset DAY) AS DATE
+                        FROM UNNEST(GENERATE_ARRAY(0, 1000000)) AS day_offset)
+
+SELECT DATE                                                        AS DATE,
+       EXTRACT(YEAR FROM DATE)                                     AS YEAR,
+       FORMAT_TIMESTAMP('%Y %B', DATE)                             AS YEAR_MONTH,
+       CONCAT(CAST(EXTRACT(YEAR FROM DATE) AS STRING), ' ',
+              FORMAT_TIMESTAMP('%B', DATE))                        AS YEAR_MONTH_NAME,
+       FORMAT_TIMESTAMP('%Y %m', DATE)                             AS YEAR_MONTH_NO,
+       EXTRACT(YEAR FROM DATE) * 12 + EXTRACT(MONTH FROM DATE) - 1 AS YEAR_MONTH_NUMBER,
+       CONCAT(CAST(EXTRACT(YEAR FROM DATE) AS STRING), ' W',
+              CAST(EXTRACT(WEEK FROM DATE) AS STRING))             AS YEAR_WEEK_NAME,
+       CONCAT(CAST(EXTRACT(YEAR FROM DATE) AS STRING), ' ',
+              CAST(EXTRACT(WEEK FROM DATE) AS STRING))             AS YEAR_WEEK,
+       EXTRACT(YEAR FROM DATE) * 52 + EXTRACT(WEEK FROM DATE) - 1  AS YEAR_WEEK_NUMBER
+FROM DATE_GENERATOR
+WHERE DATE < '2035-01-01'

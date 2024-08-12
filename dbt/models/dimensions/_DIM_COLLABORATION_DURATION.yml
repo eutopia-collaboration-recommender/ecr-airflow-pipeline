@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: DIM_COLLABORATION_DURATION
+    description: "The dimension table for collaboration duration."
+    columns:
+      - name: COLLABORATION_DURATION_SID
+        description: "A unique identifier for the collaboration duration."
+        tests:
+          - not_null
+          - unique
+      - name: COLLABORATION_DURATION_NAME
+        description: "The name of the collaboration duration (new partnership, extended collaboration, long-term collaboration)."
+        tests:
+          - not_null
+          - accepted_values: { values: [ 'New partnership',
+                                         'Extended collaboration',
+                                         'Long-term collaboration'
+          ] }
+      - name: COLLABORATION_DURATION_SORT_INDEX
+        description: "The sort index for the collaboration duration."
+        tests:
+          - not_null

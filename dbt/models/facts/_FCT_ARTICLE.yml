@@ -1,0 +1,66 @@
+version: 2
+
+models:
+  - name: FCT_ARTICLE
+    description: "This fact table contains information about value and predictors of a research collaborations."
+    columns:
+      - name: ARTICLE_SID
+        description: "A unique identifier for the article."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('DIM_ARTICLE')
+              field: ARTICLE_SID
+      - name: ARTICLE_PUBLICATION_DT
+        description: "The publication date of the article."
+        tests:
+          - not_null
+      - name: COLLABORATION_NOVELTY_INDEX
+        description: "The novelty index of the collaboration that captures the importance of a new collaboration taking into account that collaborations with more new authors, new institutions are more important and that small collaborations and collaborations between authors and institutions that have not collaborated before are more important."
+        tests:
+          - not_null
+      - name: PAIRWISE_COLLABORATION_DURATION
+        description: "Proxy collaboration duration metric measuring the maximum number of previous articles between any pair of authors withing the collaboration."
+        tests:
+          - not_null
+      - name: LEAD_AUTHOR_COLLABORATION_RATE
+        description: "The rate of collaboration of the lead author. This is the number of external collaborations of the lead author divided by the number of articles of the lead author. Note that we only count EUTOPIA publications, meaning that the lead author may be much less or more collaborative outside of EUTOPIA institutions. Also, external authors should have higher collaboration rates."
+        tests:
+          - not_null
+      - name: LEAD_AUTHOR_PREVIOUS_ARTICLE_COUNT
+        description: "The number of previous articles of the lead author. Here, we also count articles outside of EUTOPIA institutions for EUTOPIA authors, whereas for external authors we only count EUTOPIA articles."
+        tests:
+          - not_null
+      - name: LEAD_AUTHOR_PREVIOUS_EUTOPIA_ARTICLE_COUNT
+        description: "The number of previous EUTOPIA articles of the lead author."
+        tests:
+          - not_null
+      - name: AVG_PREVIOUS_ARTICLE_COUNT
+        description: "The average number of previous articles of all authors in the collaboration. Only EUTOPIA articles are counted for external authors."
+        tests:
+          - not_null
+      - name: AVG_PREVIOUS_EUTOPIA_ARTICLE_COUNT
+        description: "The average number of previous EUTOPIA articles of all authors in the collaboration. Only EUTOPIA articles are counted for external authors."
+        tests:
+          - not_null
+      - name: AVG_ARTICLE_CITATION_COUNT
+        description: "The average citation count of all past articles of all authors in the collaboration."
+        tests:
+          - not_null
+      - name: ARTICLE_CITATION_COUNT
+        description: "The citation count of the article."
+        tests:
+          - not_null
+      - name: NEW_COLLABORATION_IMPACT_COUNT
+        description: "The number of new collaborations in the collaboration."
+        tests:
+          - not_null
+      - name: PAIRWISE_COLLABORATION_CONTINUATION
+        description: "The continuation of the collaboration. This is the maximum number of articles between any pair of authors within the collaboration published after the current article."
+        tests:
+          - not_null
+      - name: PK_ARTICLE
+        description: "The primary key of the collaboration novelty fact. MD5 hash of the article SID."
+        tests:
+          - not_null
+          - unique

@@ -19,11 +19,10 @@ WITH REF_SUMMARY_BY_ARTICLE
              FROM REF_SUMMARY_BY_ARTICLE)
 SELECT DISTINCT MEMBER_ORCID_ID
               , ARTICLE_DOI
-              ,
               , ARTICLE_TITLE
-              , DATALAKE.UDF_TO_DATE_NEAREST(ARTICLE_PUBLICATION_YEAR,
-                                             ARTICLE_PUBLICATION_MONTH,
-                                             ARTICLE_PUBLICATION_DAY) AS ARTICLE_PUBLICATION_DT
+              , AIRFLOW.UDF_TO_DATE_NEAREST(ARTICLE_PUBLICATION_YEAR,
+                                            ARTICLE_PUBLICATION_MONTH,
+                                            ARTICLE_PUBLICATION_DAY) AS ARTICLE_PUBLICATION_DT
               , ARTICLE_TYPE
               , ARTICLE_URL
               , ARTICLE_JOURNAL_TITLE

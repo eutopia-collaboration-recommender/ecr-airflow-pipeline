@@ -1,0 +1,9 @@
+WITH REF_STG_CROSSREF_RESEARCH_AREA_TOP_N_ARTICLES
+         AS (SELECT * FROM {{ ref('STG_CROSSREF_RESEARCH_AREA_TOP_N_ARTICLES') }})
+SELECT DISTINCT RESEARCH_AREA_CODE,
+                ARTICLE_DOI,
+                CONCAT('query:',
+                       '\nTitle:', IFNULL(ARTICLE_TITLE, '/'),
+                       '\nAbstract:', IFNULL(ARTICLE_ABSTRACT, '/')
+                ) AS EMBEDDING_INPUT
+FROM REF_STG_CROSSREF_RESEARCH_AREA_TOP_N_ARTICLES

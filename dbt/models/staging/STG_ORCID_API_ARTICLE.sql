@@ -1,7 +1,7 @@
 WITH SOURCE_TABLE
          AS (SELECT ORCID_ID,
                     JSON
-             FROM {{ source('DATALAKE', 'ORCID_API_AUTHOR') }})
+             FROM {{ source('AIRFLOW', 'ORCID_API_AUTHOR') }})
         ,
      API_ORCID_ARTICLE_JSON
          AS (SELECT ORCID_ID                                                              AS ORCID_ID

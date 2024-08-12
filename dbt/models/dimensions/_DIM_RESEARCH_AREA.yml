@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: DIM_RESEARCH_AREA
+    description: "The dimension table for research topics including all research topics and topic classification from the CERIF registry."
+    columns:
+      - name: RESEARCH_AREA_SID
+        description: "A unique identifier for the research topic."
+        tests:
+          - not_null
+          - unique
+      - name: RESEARCH_BRANCH_CODE
+        description: "The code of the research branch."
+        tests:
+          - not_null
+      - name: RESEARCH_BRANCH_NAME
+        description: "The name of the research branch."
+        tests:
+          - not_null
+      - name: RESEARCH_SUBBRANCH_CODE
+        description: "The code of the research subbranch."
+        tests:
+          - not_null
+      - name: RESEARCH_SUBBRANCH_NAME
+        description: "The name of the research subbranch."
+        tests:
+          - not_null
+      - name: RESEARCH_AREA_CODE
+        description: "The code of the research topic."
+        tests:
+          - not_null
+      - name: RESEARCH_AREA_NAME
+        description: "The name of the research topic."
+        tests:
+          - not_null
+          - unique

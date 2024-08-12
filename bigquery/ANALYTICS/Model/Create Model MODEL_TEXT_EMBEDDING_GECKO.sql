@@ -3,5 +3,6 @@
 --Create a remote model that connects to the AI Platform model
 CREATE
 MODEL `collaboration-recommender`.ANALYTICS.MODEL_TEXT_EMBEDDING_GECKO
-REMOTE WITH CONNECTION `collaboration-recommender.us.ai-connection`
-OPTIONS(remote_service_type = 'CLOUD_AI_TEXT_EMBEDDING_MODEL_V1');
+REMOTE
+WITH CONNECTION `collaboration-recommender.us.ai-connection`
+    OPTIONS (remote_service_type = 'CLOUD_AI_TEXT_EMBEDDING_MODEL_V1');

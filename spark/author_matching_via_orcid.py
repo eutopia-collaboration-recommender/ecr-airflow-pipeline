@@ -14,9 +14,9 @@ from pyspark.sql.window import Window
 JOB_CONFIG = {
     "APP_NAME": "AuthorMatchingViaORCID",
     "SOURCE_DATASET": "PROD",
-    "TARGET_DATASET": "DATALAKE",
+    "TARGET_DATASET": "ANALYTICS",
     "TARGET_TABLE": f"AUTHOR_MATCH_CANDIDATE_PAIR_BY_ORCID",
-    "TEMPORARY_GCS_BUCKET": "ecr-dataproc-cluster-1",
+    "TEMPORARY_GCS_BUCKET": "ecr-composer-bucket-dataproc-temp",
     "SAVE_MODE": "append",
 }
 

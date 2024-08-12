@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: DIM_COLLABORATION_TYPE
+    description: "The dimension table for collaboration type."
+    columns:
+      - name: COLLABORATION_TYPE_SID
+        description: "A unique identifier for the collaboration type."
+        tests:
+          - not_null
+          - unique
+      - name: COLLABORATION_TYPE_NAME
+        description: "The name of the collaboration type (sole-author publication, internal collaboration, external collaboration)."
+        tests:
+          - not_null
+          - accepted_values: { values: [ 'Sole-author publication',
+                                         'Internal collaboration',
+                                         'External collaboration',
+          ] }
+      - name: COLLABORATION_TYPE_CATEGORY
+        description: "The category of the collaboration type (collaboration, sole-author)."
+        tests:
+          - not_null
+          - accepted_values: { values: [ 'Collaboration',
+                                         'Sole-author',
+          ] }
+      - name: COLLABORATION_TYPE_SORT_INDEX
+        description: "The sort index for the collaboration type."
+        tests:
+          - not_null

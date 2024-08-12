@@ -1,7 +1,7 @@
 WITH SOURCE_TABLE
          AS (SELECT ORCID_ID,
                     JSON
-             FROM {{ source('DATALAKE', 'ORCID_API_AUTHOR') }})
+             FROM {{ source('AIRFLOW', 'ORCID_API_AUTHOR') }})
 SELECT ORCID_ID                                                   AS MEMBER_ORCID_ID
      , JSON_EXTRACT_SCALAR(
         JSON, '$.person.name.given-names.value'

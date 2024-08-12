@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: FCT_COLLABORATION_NOVELTY
+    description: "This fact table contains information about the novelty of collaborations between authors and institutions."
+    columns:
+      - name: ARTICLE_SID
+        description: "A unique identifier for the article."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('DIM_ARTICLE')
+              field: ARTICLE_SID
+      - name: COLLABORATION_NOVELTY_INDEX
+        description: "The novelty index of the collaboration that captures the importance of a new collaboration taking into account that collaborations with more new authors, new institutions are more important and that small collaborations and collaborations between authors and institutions that have not collaborated before are more important."
+        tests:
+          - not_null
+      - name: PK_COLLABORATION_NOVELTY
+        description: "The primary key of the collaboration novelty fact. MD5 hash of the article SID."
+        tests:
+          - not_null
+          - unique

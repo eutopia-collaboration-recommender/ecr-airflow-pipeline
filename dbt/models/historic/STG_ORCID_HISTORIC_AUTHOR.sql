@@ -1,7 +1,7 @@
 WITH SOURCE_TABLE
-         AS (SELECT FILEPATH
+         AS (SELECT ORCID_ID
                   , JSON
-             FROM {{ source('DATALAKE', 'ORCID_HISTORIC_AUTHOR') }})
+             FROM {{ source('AIRFLOW', 'ORCID_HISTORIC_AUTHOR') }})
 SELECT JSON_EXTRACT_SCALAR(
         JSON, '$.record:record.common:orcid-identifier.common:path'
        )                                                   AS MEMBER_ORCID_ID

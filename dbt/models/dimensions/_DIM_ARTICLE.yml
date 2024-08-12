@@ -1,0 +1,83 @@
+version: 2
+
+models:
+  - name: DIM_ARTICLE
+    description: "The dimension table for articles."
+    columns:
+      - name: ARTICLE_SID
+        description: "A unique identifier for the article."
+        tests:
+          - not_null
+          - unique
+      - name: ARTICLE_DOI
+        description: "The DOI of the article."
+        tests:
+          - not_null
+          - unique
+      - name: ARTICLE_URL
+        description: "The URL of the article."
+        tests:
+          - not_null
+          - unique
+      - name: ARTICLE_TITLE
+        description: "The title of the article."
+        tests:
+          - not_null
+      - name: ARTICLE_LANGUAGE
+        description: "The language of the article derived from the article title, subtitle and abstract."
+        tests:
+          - not_null
+      - name: ARTICLE_PUBLICATION_DT
+        description: "The publication date of the article. We build a date from the year, month, and day data fields and default to the first day of the month if the day is not provided and the first day of the year if the month is not provided."
+        tests:
+          - not_null
+      - name: IS_ARTICLE_ENGLISH
+        description: "A flag indicating if the article is written in English based on the ARTICLE_LANGUAGE field."
+        tests:
+          - not_null
+      - name: HAS_SUFFICIENT_TEXT_FOR_EMBEDDING
+        description: "A flag indicating if the article has sufficient text for embedding. It must have either references, abstract, or full text."
+        tests:
+          - not_null
+      - name: HAS_TEXT_EMBEDDING
+        description: "A flag indicating if the article has text embedding generated already."
+        tests:
+          - not_null
+      - name: HAS_ABSTRACT
+        description: "A flag indicating if the article contains an abstract."
+        tests:
+          - not_null
+      - name: HAS_REFERENCES
+        description: "A flag indicating if the article contains data about references."
+        tests:
+          - not_null
+      - name: IS_ARTICLE_OPEN_ACCESS
+        description: "A flag indicating if the article is open access, checking the open access status of the article in the Unpaywall database."
+        tests:
+          - not_null
+      - name: IS_ARTICLE_RELEVANT
+        description: "A flag indicating if the article is written in English, has sufficient text for embedding and is affiliated with a EUTOPIA institution."
+        tests:
+          - not_null
+      - name: IS_SOLE_AUTHOR_PUBLICATION
+        description: "A flag indicating if the article is a sole author publication, meaning that it has only one author."
+        tests:
+          - not_null
+      - name: IS_INTERNAL_COLLABORATION
+        description: "A flag indicating if the article is an internal collaboration, meaning that all authors come from the same institution."
+        tests:
+          - not_null
+      - name: IS_EXTERNAL_COLLABORATION
+        description: "A flag indicating if the article is an external collaboration, meaning that authors come from different institutions."
+        tests:
+          - not_null
+      - name: IS_EUTOPIAN_COLLABORATION
+        description: "A flag indicating if the article is an EUTOPIAN collaboration, meaning that authors come from multiple EUTOPIA institutions."
+        tests:
+          - not_null
+      - name: IS_EUTOPIAN_PUBLICATION
+        description: "A flag indicating if the article is an EUTOPIAN publication, meaning that at least one author is affiliated with an EUTOPIA institution."
+        tests:
+          - not_null
+
+

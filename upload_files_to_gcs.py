@@ -5,7 +5,7 @@ from os.path import expanduser
 
 from google.cloud import storage
 
-BUCKET_NAME = "us-central1-eutopia-compose-39e53e1a-bucket"
+BUCKET_NAME = "ecr-composer-bucket-main"
 
 
 def hex_to_base64(hex_str: str):

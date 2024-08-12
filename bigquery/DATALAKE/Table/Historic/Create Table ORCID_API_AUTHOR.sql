@@ -3,11 +3,3 @@ CREATE OR REPLACE TABLE `collaboration-recommender`.AIRFLOW.ORCID_API_AUTHOR
     ORCID_ID STRING,
     JSON     STRING
 );
-
-
-CREATE OR REPLACE TABLE `collaboration-recommender`.DATALAKE.ORCID_API_AUTHOR_TEMP
-(
-    ORCID_ID STRING,
-    JSON     STRING
-);
-

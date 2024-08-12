@@ -11,8 +11,9 @@ from airflow.utils.trigger_rule import TriggerRule
 default_args = {
     "project_id": "collaboration-recommender",  # Replace with your GCP project ID
     "region": "us-central1",  # Replace with your Dataproc region
-    "cluster_name": "cluster-b878",  # Name for the Dataproc cluster
-    "bucket_name": "us-central1-eutopia-compose-39e53e1a-bucket",  # Your GCS bucket name
+    "cluster_name": "ecr-composer-cluster",  # Name for the Dataproc cluster
+    "bucket_name": "ecr-composer-bucket-main",  # Your GCS bucket name
+    "job_name": "author_matching_via_orcid",  # Name for the PySpark job
     "start_date": days_ago(1),
 }
 
@@ -39,7 +40,7 @@ with DAG(
         job={
             "placement": {"cluster_name": default_args["cluster_name"]},
             "pyspark_job": {
-                "main_python_file_uri": f"gs://{default_args['bucket_name']}/spark/author_matching_via_orcid.py"
+                "main_python_file_uri": f"gs://{default_args['bucket_name']}/spark/{default_args['job_name']}.py"
             },
         },
     )

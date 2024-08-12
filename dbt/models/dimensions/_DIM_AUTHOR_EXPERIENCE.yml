@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: DIM_AUTHOR_EXPERIENCE
+    description: "The dimension table for author experience."
+    columns:
+      - name: AUTHOR_EXPERIENCE_SID
+        description: "A unique identifier for the author experience."
+        tests:
+          - not_null
+          - unique
+      - name: AUTHOR_EXPERIENCE_NAME
+        description: "The name of the author experience (early career author, mid career, established author)."
+        tests:
+          - not_null
+          - accepted_values: { values: [ 'Early-career author',
+                                         'Mid-career author',
+                                         'Experienced author'
+          ] }
+      - name: AUTHOR_EXPERIENCE_SORT_INDEX
+        description: "The sort index for the author experience."
+        tests:
+          - not_null
