@@ -24,11 +24,11 @@ WITH DT AS (SELECT DATE_ADD(DATE '1900-01-01', INTERVAL DT_SEQ DAY) AS DT
             FROM UNNEST(GENERATE_ARRAY(0, DATE_DIFF(CURRENT_DATE(), DATE '1900-01-01', DAY))) AS DT_SEQ)
    , REF_STG_ORCID_EMPLOYMENT AS (SELECT * FROM {{ ref('STG_ORCID_EMPLOYMENT') }})
    , REF_STG_ORCID_ARTICLE AS (SELECT * FROM {{ ref('STG_ORCID_ARTICLE') }})
-   , REF_STG_CROSSREF_AUTHOR AS (SELECT * FROM {{ ref('STG_CROSSREF_AUTHOR') }})
-   , MIN_PUBLICATION_DT_BY_ORCID_ID AS (SELECT MEMBER_ORCID_ID
+   , REF_STG_CROSSREF_AUTHOR AS (SELECT * FROM {{ ref('ER_CROSSREF_AUTHOR') }})
+   , MIN_PUBLICATION_DT_BY_ORCID_ID AS (SELECT ORCID_ID
                                              , MIN(ARTICLE_PUBLICATION_DT) AS ARTICLE_FIRST_PUBLICATION_DT
                                         FROM REF_STG_ORCID_ARTICLE
-                                        GROUP BY MEMBER_ORCID_ID)
+                                        GROUP BY ORCID_ID)
 -- For every date, we connect it to every ORCID_ID if:
 -- 1. The date is greater than the first publication date of the ORCID_ID
 -- 2. The date is less than the current date
@@ -45,7 +45,7 @@ FROM MIN_PUBLICATION_DT_BY_ORCID_ID A
                     ON D.DT >= A.ARTICLE_FIRST_PUBLICATION_DT
                         AND D.DT < CURRENT_DATE()
          INNER JOIN REF_STG_ORCID_EMPLOYMENT E
-                    ON A.MEMBER_ORCID_ID = E.MEMBER_ORCID_ID
+                    ON A.ORCID_ID = E.ORCID_ID
                         AND (
                            -- The date is between the EMPLOYMENT_START_DT and EMPLOYMENT_END_DT plus 12 months (due to assumption)
                            (D.DT BETWEEN E.EMPLOYMENT_START_DT
@@ -59,7 +59,7 @@ FROM MIN_PUBLICATION_DT_BY_ORCID_ID A
                                OR (E.EMPLOYMENT_START_DT IS NULL AND E.EMPLOYMENT_END_DT IS NULL))
                            )
          INNER JOIN REF_STG_CROSSREF_AUTHOR CR_A
-                    ON A.MEMBER_ORCID_ID = CR_A.AUTHOR_ORCID_ID
+                    ON A.ORCID_ID = CR_A.AUTHOR_ORCID_ID
 WHERE E.IS_EUTOPIA_AFFILIATED_INSTITUTION = TRUE
   AND CR_A.AUTHOR_ORCID_ID IS NOT NULL
 GROUP BY CR_A.AUTHOR_SID

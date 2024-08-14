@@ -41,17 +41,28 @@ models:
       +materialized: table
       +tags:
         - "base"
+        - "staging"
 
-    # The `final` tag is used to identify models that represent the final output of a dbt project - before this is run, we need to generate text embeddings in the ANALYTICS schema.
+    # The `model` tag is used to identify models that represent the model output of a dbt project - before this is run, we need to generate text embeddings in the ANALYTICS schema.
+    enrichment:
+      +materialized: table
+      +tags:
+        - "final"
+        - "enrichment"
     intermediate:
       +materialized: table
       +tags:
         - "final"
+        - "intermediate"
     dimensions:
       +materialized: table
       +tags:
         - "final"
+        - "fact_and_dimension"
+        - "dimension"
     facts:
       +materialized: table
       +tags:
         - "final"
+        - "fact_and_dimension"
+        - "fact"

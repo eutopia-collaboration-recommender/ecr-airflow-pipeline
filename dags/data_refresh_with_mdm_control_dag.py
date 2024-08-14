@@ -13,6 +13,7 @@ from airflow.providers.google.cloud.operators.dataproc import (
 )
 from airflow.utils.trigger_rule import TriggerRule
 
+from util.common.common import get_sheet_data
 from util.data_refresh_tasks import (
     article_language_classification_task_wrapper,
     article_research_area_classification_task_wrapper,
@@ -30,6 +31,22 @@ PROJECT_ID = "collaboration-recommender"
 INGESTION_SCHEMA = "AIRFLOW"
 ANALYTICS_SCHEMA = "ANALYTICS"
 DBT_TARGET_SCHEMA = "PROD"
+MDM_CONFIG = {
+    "spreadsheet_id": "1xyDk6odE7wmRz-X0nQysTPEBEAjkoHa6q7vE-_akoIg",
+    "sheet_id": "COMPOSER_ACTIVE_TASKS",
+    "range": "A1:B1000",
+}
+
+ACTIVE_TASK_DICT = (
+    get_sheet_data(
+        spreadsheet_id=MDM_CONFIG["spreadsheet_id"],
+        sheet_id=MDM_CONFIG["sheet_id"],
+        data_range=MDM_CONFIG["range"],
+    )
+    .set_index("TASK")
+    .to_dict()["IS_TASK_ACTIVE"]
+)
+
 
 # Configuration for the Dataproc cluster
 DATAPROC_CLUSTER_CONFIG = {
@@ -55,18 +72,12 @@ ORCID_RECORDS_FROM_IDS_TASK = {
     "n_max_iterations_to_offload": 100,
 }
 
+
 # Task configuration for the dbt build base
 DBT_BUILD_BASE_TASK = {
     "project_dir": "/home/airflow/gcs/dags",
     "profiles_dir": "/home/airflow/gcs/data",
     "select": "tag:base",
-}
-
-# Task configuration for the dbt build base
-DBT_BUILD_FINAL_TASK = {
-    "project_dir": "/home/airflow/gcs/dags",
-    "profiles_dir": "/home/airflow/gcs/data",
-    "select": "tag:final",
 }
 
 # Task configuration for author matching via ORCID
@@ -112,7 +123,7 @@ AUTHOR_MATCH_CONNECTED_COMPONENT_BY_NEIGHBORHOOD_TASK = {
 # DAG definition
 ####################################################################################################
 
-DAG_NAME = "data_refresh_dag"
+DAG_NAME = "data_refresh_with_mdm_control_dag"
 DAG_DEFAULT_ARGS = {
     "owner": "Luka",
     "start_date": datetime(2024, 8, 1),
@@ -195,116 +206,196 @@ with dag:
     ####################################################################################################
 
     # Task to materialize CROSSREF_ARTICLE_EUTOPIA
-    materialize_crossref_article_eutopia_task = PythonOperator(
-        task_id="materialize_crossref_article_eutopia_task",
-        python_callable=materialize_crossref_article_eutopia_task,
-        dag=dag,
-    )
+    if ACTIVE_TASK_DICT["materialize_crossref_article_eutopia_task"] == "TRUE":
+        materialize_crossref_article_eutopia_task = PythonOperator(
+            task_id="materialize_crossref_article_eutopia_task",
+            python_callable=materialize_crossref_article_eutopia_task,
+            dag=dag,
+        )
+    else:
+        materialize_crossref_article_eutopia_task = BashOperator(
+            task_id="materialize_crossref_article_eutopia_task",
+            bash_command='echo "Task `materialize_crossref_article_eutopia_task` is not active and will not be executed."',
+            dag=dag,
+        )
 
     # Task to start Dataproc cluster
-    start_cluster_task = DataprocStartClusterOperator(
-        task_id="start_cluster_task",
-        project_id=PROJECT_ID,
-        region=DATAPROC_CLUSTER_CONFIG["region"],
-        cluster_name=DATAPROC_CLUSTER_CONFIG["name"],
-    )
+    if ACTIVE_TASK_DICT["start_cluster_task"] == "TRUE":
+        start_cluster_task = DataprocStartClusterOperator(
+            task_id="start_cluster_task",
+            project_id=PROJECT_ID,
+            region=DATAPROC_CLUSTER_CONFIG["region"],
+            cluster_name=DATAPROC_CLUSTER_CONFIG["name"],
+        )
+    else:
+        start_cluster_task = BashOperator(
+            task_id="start_cluster_task",
+            bash_command='echo "Task `start_cluster_task` is not active and will not be executed."',
+            dag=dag,
+        )
 
     # Task to fetch ORCID IDs from Crossref DOIs
-    orcid_ids_from_crossref_dois_task = PythonOperator(
-        task_id="orcid_ids_from_crossref_dois_task",
-        python_callable=orcid_ids_from_crossref_dois_task,
-        dag=dag,
-    )
+    if ACTIVE_TASK_DICT["orcid_ids_from_crossref_dois_task"] == "TRUE":
+        orcid_ids_from_crossref_dois_task = PythonOperator(
+            task_id="orcid_ids_from_crossref_dois_task",
+            python_callable=orcid_ids_from_crossref_dois_task,
+            dag=dag,
+        )
+    else:
+        orcid_ids_from_crossref_dois_task = BashOperator(
+            task_id="orcid_ids_from_crossref_dois_task",
+            bash_command='echo "Task `orcid_ids_from_crossref_dois_task` is not active and will not be executed."',
+            dag=dag,
+        )
 
     # Task to fetch ORCID records from ORCID IDs
-    orcid_records_from_ids_task = PythonOperator(
-        task_id="orcid_records_from_ids_task",
-        python_callable=orcid_records_from_ids_task,
-        dag=dag,
-    )
+    if ACTIVE_TASK_DICT["orcid_records_from_ids_task"] == "TRUE":
+        orcid_records_from_ids_task = PythonOperator(
+            task_id="orcid_records_from_ids_task",
+            python_callable=orcid_records_from_ids_task,
+            dag=dag,
+        )
+    else:
+        orcid_records_from_ids_task = BashOperator(
+            task_id="orcid_records_from_ids_task",
+            bash_command='echo "Task `orcid_records_from_ids_task` is not active and will not be executed."',
+            dag=dag,
+        )
 
     # Task to build base dbt model
-    dbt_build_base_task = BashOperator(
-        task_id="dbt_build_base_task",
-        bash_command=f"dbt build --project-dir {DBT_BUILD_BASE_TASK['project_dir']} --profiles-dir {DBT_BUILD_BASE_TASK['profiles_dir']} --select {DBT_BUILD_BASE_TASK['select']}",
-        dag=dag,
-    )
+    if ACTIVE_TASK_DICT["dbt_build_base_task"] == "TRUE":
+        dbt_build_base_task = BashOperator(
+            task_id="dbt_build_base_task",
+            bash_command=f"dbt build --project-dir {DBT_BUILD_BASE_TASK['project_dir']} --profiles-dir {DBT_BUILD_BASE_TASK['profiles_dir']} --select {DBT_BUILD_BASE_TASK['select']}",
+            dag=dag,
+        )
+    else:
+        dbt_build_base_task = BashOperator(
+            task_id="dbt_build_base_task",
+            bash_command='echo "Task `dbt_build_base_task` is not active and will not be executed."',
+            dag=dag,
+        )
 
     # Task submit PySpark job to Dataproc: Author matching via ORCID
-    author_matching_via_orcid_task = DataprocSubmitJobOperator(
-        task_id="author_matching_via_orcid_task",
-        project_id=PROJECT_ID,
-        region=DATAPROC_CLUSTER_CONFIG["region"],
-        job={
-            "placement": {"cluster_name": DATAPROC_CLUSTER_CONFIG["name"]},
-            "pyspark_job": {
-                "main_python_file_uri": f"gs://{DATAPROC_CLUSTER_CONFIG['bucket_name']}/spark/{AUTHOR_MATCHING_VIA_ORCID_TASK['pyspark_job']}",
-                "properties": {
-                    "spark.jars.packages": "com.google.cloud.spark:spark-bigquery-with-dependencies_2.12:0.24.2",
+    if ACTIVE_TASK_DICT["author_matching_via_orcid_task"] == "TRUE":
+        author_matching_via_orcid_task = DataprocSubmitJobOperator(
+            task_id="author_matching_via_orcid_task",
+            project_id=PROJECT_ID,
+            region=DATAPROC_CLUSTER_CONFIG["region"],
+            job={
+                "placement": {"cluster_name": DATAPROC_CLUSTER_CONFIG["name"]},
+                "pyspark_job": {
+                    "main_python_file_uri": f"gs://{DATAPROC_CLUSTER_CONFIG['bucket_name']}/spark/{AUTHOR_MATCHING_VIA_ORCID_TASK['pyspark_job']}",
+                    "properties": {
+                        "spark.jars.packages": "com.google.cloud.spark:spark-bigquery-with-dependencies_2.12:0.24.2",
+                    },
                 },
             },
-        },
-    )
+        )
+    else:
+        author_matching_via_orcid_task = BashOperator(
+            task_id="author_matching_via_orcid_task",
+            bash_command='echo "Task `author_matching_via_orcid_task` is not active and will not be executed."',
+            dag=dag,
+        )
 
     # Task to author match by neighborhood
-    author_matching_via_neighborhood_task = DataprocSubmitJobOperator(
-        task_id="author_matching_via_neighborhood_task",
-        project_id=PROJECT_ID,
-        region=DATAPROC_CLUSTER_CONFIG["region"],
-        job={
-            "placement": {"cluster_name": DATAPROC_CLUSTER_CONFIG["name"]},
-            "pyspark_job": {
-                "main_python_file_uri": f"gs://{DATAPROC_CLUSTER_CONFIG['bucket_name']}/spark/{AUTHOR_MATCHING_VIA_NEIGHBORHOOD_TASK['pyspark_job']}",
-                "properties": {
-                    "spark.jars.packages": "com.google.cloud.spark:spark-bigquery-with-dependencies_2.12:0.24.2",
+    if ACTIVE_TASK_DICT["author_matching_via_neighborhood_task"] == "TRUE":
+        author_matching_via_neighborhood_task = DataprocSubmitJobOperator(
+            task_id="author_matching_via_neighborhood_task",
+            project_id=PROJECT_ID,
+            region=DATAPROC_CLUSTER_CONFIG["region"],
+            job={
+                "placement": {"cluster_name": DATAPROC_CLUSTER_CONFIG["name"]},
+                "pyspark_job": {
+                    "main_python_file_uri": f"gs://{DATAPROC_CLUSTER_CONFIG['bucket_name']}/spark/{AUTHOR_MATCHING_VIA_NEIGHBORHOOD_TASK['pyspark_job']}",
+                    "properties": {
+                        "spark.jars.packages": "com.google.cloud.spark:spark-bigquery-with-dependencies_2.12:0.24.2",
+                    },
                 },
             },
-        },
-    )
+        )
+    else:
+        author_matching_via_neighborhood_task = BashOperator(
+            task_id="author_matching_via_neighborhood_task",
+            bash_command='echo "Task `author_matching_via_neighborhood_task` is not active and will not be executed."',
+            dag=dag,
+        )
 
     # Task to author match connected component by neighborhood
-    author_match_connected_component_by_neighborhood_task = PythonOperator(
-        task_id="author_match_connected_component_by_neighborhood_task",
-        python_callable=author_match_connected_component_by_neighborhood_task,
-        dag=dag,
-    )
+    if (
+        ACTIVE_TASK_DICT["author_match_connected_component_by_neighborhood_task"]
+        == "TRUE"
+    ):
+        author_match_connected_component_by_neighborhood_task = PythonOperator(
+            task_id="author_match_connected_component_by_neighborhood_task",
+            python_callable=author_match_connected_component_by_neighborhood_task,
+            dag=dag,
+        )
+    else:
+        author_match_connected_component_by_neighborhood_task = BashOperator(
+            task_id="author_match_connected_component_by_neighborhood_task",
+            bash_command='echo "Task `author_match_connected_component_by_neighborhood_task` is not active and will not be executed."',
+            dag=dag,
+        )
 
     # Task to embed article contents with Gecko
-    text_embedding_article_gecko_task = PythonOperator(
-        task_id="text_embedding_article_gecko_task",
-        python_callable=text_embedding_article_gecko_task,
-        dag=dag,
-    )
+    if ACTIVE_TASK_DICT["text_embedding_article_gecko_task"] == "TRUE":
+        text_embedding_article_gecko_task = PythonOperator(
+            task_id="text_embedding_article_gecko_task",
+            python_callable=text_embedding_article_gecko_task,
+            dag=dag,
+        )
+    else:
+        text_embedding_article_gecko_task = BashOperator(
+            task_id="text_embedding_article_gecko_task",
+            bash_command='echo "Task `text_embedding_article_gecko_task` is not active and will not be executed."',
+            dag=dag,
+        )
 
     # Task to classify research areas for articles
-    article_research_area_classification_task = PythonOperator(
-        task_id="article_research_area_classification_task",
-        python_callable=article_research_area_classification_task,
-        dag=dag,
-    )
+    if ACTIVE_TASK_DICT["article_research_area_classification_task"] == "TRUE":
+        article_research_area_classification_task = PythonOperator(
+            task_id="article_research_area_classification_task",
+            python_callable=article_research_area_classification_task,
+            dag=dag,
+        )
+    else:
+        article_research_area_classification_task = BashOperator(
+            task_id="article_research_area_classification_task",
+            bash_command='echo "Task `article_research_area_classification_task` is not active and will not be executed."',
+            dag=dag,
+        )
 
     # Task to classify article languages
-    article_language_classification_task = PythonOperator(
-        task_id="article_language_classification_task",
-        python_callable=article_language_classification_task,
-        dag=dag,
-    )
+    if ACTIVE_TASK_DICT["article_language_classification_task"] == "TRUE":
+        article_language_classification_task = PythonOperator(
+            task_id="article_language_classification_task",
+            python_callable=article_language_classification_task,
+            dag=dag,
+        )
+    else:
+        article_language_classification_task = BashOperator(
+            task_id="article_language_classification_task",
+            bash_command='echo "Task `article_language_classification_task` is not active and will not be executed."',
+            dag=dag,
+        )
 
     # Task to stop Dataproc cluster
-    stop_cluster_task = DataprocStopClusterOperator(
-        task_id="stop_cluster_task",
-        project_id=PROJECT_ID,
-        region=DATAPROC_CLUSTER_CONFIG["region"],
-        cluster_name=DATAPROC_CLUSTER_CONFIG["name"],
-        trigger_rule=TriggerRule.ALL_DONE,  # Ensures cluster is stopped even if the job fails
-    )
-
-    # Task to build final dbt model
-    dbt_build_final_task = BashOperator(
-        task_id="dbt_build_final_task",
-        bash_command=f"dbt build --project-dir {DBT_BUILD_FINAL_TASK['project_dir']} --profiles-dir {DBT_BUILD_FINAL_TASK['profiles_dir']} --select {DBT_BUILD_FINAL_TASK['select']}",
-        dag=dag,
-    )
+    if ACTIVE_TASK_DICT["stop_cluster_task"] == "TRUE":
+        stop_cluster_task = DataprocStopClusterOperator(
+            task_id="stop_cluster_task",
+            project_id=PROJECT_ID,
+            region=DATAPROC_CLUSTER_CONFIG["region"],
+            cluster_name=DATAPROC_CLUSTER_CONFIG["name"],
+            trigger_rule=TriggerRule.ALL_DONE,  # Ensures cluster is stopped even if the job fails
+        )
+    else:
+        stop_cluster_task = BashOperator(
+            task_id="stop_cluster_task",
+            bash_command='echo "Task `stop_cluster_task` is not active and will not be executed."',
+            dag=dag,
+        )
 
     ####################################################################################################
     # Define task dependencies
@@ -349,6 +440,3 @@ with dag:
     article_research_area_classification_task.set_downstream(
         article_language_classification_task
     )
-
-    dbt_build_final_task.set_upstream(stop_cluster_task)
-    dbt_build_final_task.set_upstream(article_language_classification_task)

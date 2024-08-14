@@ -8,7 +8,7 @@ WITH REF_DIM_ARTICLE AS (SELECT * FROM {{ref('DIM_ARTICLE')}} WHERE EXTRACT(YEAR
                                                IS_EXTERNAL_COLLABORATION,
                                                IS_INTERNAL_COLLABORATION,
                                                IS_SOLE_AUTHOR_PUBLICATION
-                               FROM {{ref('STG_COLLABORATION')}})
+                               FROM {{ref('ER_COLLABORATION')}})
    , REF_STG_COLLABORATION_NOVELTY_INDEX
     AS (SELECT DISTINCT ARTICLE_SID,
                         COLLABORATION_NOVELTY_INDEX

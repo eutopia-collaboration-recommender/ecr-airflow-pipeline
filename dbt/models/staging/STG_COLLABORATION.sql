@@ -1,9 +1,9 @@
 WITH REF_STG_CROSSREF_HISTORIC_ARTICLE AS (SELECT *
                                            FROM {{ ref('STG_CROSSREF_HISTORIC_ARTICLE_FINAL') }})
-   , REF_INT_ORCID_EUTOPIA_AFFILIATION_BY_DATE AS (SELECT * FROM {{ ref('STG_ORCID_EUTOPIA_AFFILIATION_BY_DATE') }})
+    {#   , REF_INT_ORCID_EUTOPIA_AFFILIATION_BY_DATE AS (SELECT * FROM {{ ref('STG_ORCID_EUTOPIA_AFFILIATION_BY_DATE') }})#}
    , COLLABORATION_WITH_INSTITUTION AS (SELECT DISTINCT M.ARTICLE_SID
                                                       , M.AUTHOR_SID
-                                                      , COALESCE(M.INSTITUTION_SID, O_AD.INSTITUTION_SID,
+                                                      , COALESCE(M.INSTITUTION_SID, # O_AD.INSTITUTION_SID,
                                                                  IF(M.ORIGINAL_AFFILIATION_NAME IS NULL, 'n/a', 'OTHER')) AS
                                                                                                                              INSTITUTION_SID
                                                       , M.ARTICLE_EST_PUBLISH_DT                                          AS ARTICLE_PUBLICATION_DT
@@ -11,10 +11,10 @@ WITH REF_STG_CROSSREF_HISTORIC_ARTICLE AS (SELECT *
                                                       , M.AUTHOR_INDEX
                                                       , M.IS_REFERENCED_BY_COUNT
                                         FROM REF_STG_CROSSREF_HISTORIC_ARTICLE M
-                                                 LEFT JOIN REF_INT_ORCID_EUTOPIA_AFFILIATION_BY_DATE O_AD
-                                                           ON O_AD.AUTHOR_SID = M.AUTHOR_SID
-                                                               AND O_AD.MONTH_DT =
-                                                                   DATE_TRUNC(M.ARTICLE_EST_PUBLISH_DT, MONTH))
+    {#                                                 LEFT JOIN REF_INT_ORCID_EUTOPIA_AFFILIATION_BY_DATE O_AD#}
+    {#                                                           ON O_AD.AUTHOR_SID = M.AUTHOR_SID#}
+    {#                                                               AND O_AD.MONTH_DT =#}
+    {#                                                                   DATE_TRUNC(M.ARTICLE_EST_PUBLISH_DT, MONTH)#})
    , COLLABORATION_WITH_FLAGS
     AS (SELECT DISTINCT M.ARTICLE_SID
                       , M.AUTHOR_SID

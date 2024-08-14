@@ -51,10 +51,6 @@ models:
         description: "A flag indicating if the article contains data about references."
         tests:
           - not_null
-      - name: IS_ARTICLE_OPEN_ACCESS
-        description: "A flag indicating if the article is open access, checking the open access status of the article in the Unpaywall database."
-        tests:
-          - not_null
       - name: IS_ARTICLE_RELEVANT
         description: "A flag indicating if the article is written in English, has sufficient text for embedding and is affiliated with a EUTOPIA institution."
         tests:

@@ -15,13 +15,20 @@ JOB_CONFIG = {
     "APP_NAME": "AuthorMatchingViaORCID",
     "SOURCE_DATASET": "PROD",
     "TARGET_DATASET": "ANALYTICS",
-    "TARGET_TABLE": f"AUTHOR_MATCH_CANDIDATE_PAIR_BY_ORCID",
+    "TARGET_TABLE": "AUTHOR_MATCH_CANDIDATE_PAIR_BY_ORCID",
     "TEMPORARY_GCS_BUCKET": "ecr-composer-bucket-dataproc-temp",
-    "SAVE_MODE": "append",
+    "SAVE_MODE": "overwrite",
 }
 
 # Initialize Spark session
-spark = SparkSession.builder.appName(JOB_CONFIG["APP_NAME"]).getOrCreate()
+spark = (
+    SparkSession.builder.appName(JOB_CONFIG["APP_NAME"])
+    .config(
+        "spark.jars.packages",
+        "com.google.cloud.spark:spark-bigquery-with-dependencies_2.12:0.24.2",
+    )
+    .getOrCreate()
+)
 
 # Load tables from the PROD database into Spark DataFrames
 stg_crossref_collaboration_df = (
@@ -44,14 +51,14 @@ stg_orcid_article_df = (
     spark.read.format("bigquery")
     .option("table", f"{JOB_CONFIG['SOURCE_DATASET']}.STG_ORCID_ARTICLE")
     .load()
-    .select("MEMBER_ORCID_ID", "ARTICLE_DOI")
+    .select("ORCID_ID", "ARTICLE_DOI")
     .distinct()
 )
 stg_orcid_author_df = (
     spark.read.format("bigquery")
     .option("table", f"{JOB_CONFIG['SOURCE_DATASET']}.STG_ORCID_AUTHOR")
     .load()
-    .select("MEMBER_ORCID_ID", "FULL_NAME")
+    .select("ORCID_ID", "ORCID_AUTHOR_FULL_NAME")
     .distinct()
 )
 
@@ -66,7 +73,7 @@ levenshtein_distance_by_author_pair_df = (
     )
     .join(
         stg_orcid_author_df.alias("AU"),
-        col("A.MEMBER_ORCID_ID") == col("AU.MEMBER_ORCID_ID"),
+        col("A.ORCID_ID") == col("AU.ORCID_ID"),
         "inner",
     )
     .select(
@@ -74,11 +81,11 @@ levenshtein_distance_by_author_pair_df = (
         col("F.AUTHOR_SID").alias("CROSSREF_AUTHOR_SID"),
         col("F.AUTHOR_ORCID_ID").alias("CROSSREF_ORCID_ID"),
         lower(col("F.AUTHOR_FULL_NAME")).alias("CROSSREF_LOWER_AUTHOR_FULL_NAME"),
-        col("AU.MEMBER_ORCID_ID").alias("ORCID_ID"),
-        lower(col("AU.FULL_NAME")).alias("ORCID_LOWER_AUTHOR_FULL_NAME"),
-        levenshtein(lower(col("F.AUTHOR_FULL_NAME")), lower(col("AU.FULL_NAME"))).alias(
-            "LEVENSHTEIN_DISTANCE"
-        ),
+        col("AU.ORCID_ID"),
+        lower(col("AU.ORCID_AUTHOR_FULL_NAME")).alias("ORCID_LOWER_AUTHOR_FULL_NAME"),
+        levenshtein(
+            lower(col("F.AUTHOR_FULL_NAME")), lower(col("AU.ORCID_AUTHOR_FULL_NAME"))
+        ).alias("LEVENSHTEIN_DISTANCE"),
         col("F.IS_AUTHOR_ORCID_AUTHENTICATED").alias(
             "IS_CROSSREF_AUTHOR_ORCID_AUTHENTICATED"
         ),

@@ -17,7 +17,7 @@ WITH REF_SUMMARY_BY_ARTICLE
                   , ARTICLE_URL                                      AS ARTICLE_URL
                   , ARTICLE_JOURNAL_TITLE                            AS ARTICLE_JOURNAL_TITLE
              FROM REF_SUMMARY_BY_ARTICLE)
-SELECT DISTINCT MEMBER_ORCID_ID
+SELECT DISTINCT MEMBER_ORCID_ID                                      AS ORCID_ID
               , ARTICLE_DOI
               , ARTICLE_TITLE
               , AIRFLOW.UDF_TO_DATE_NEAREST(ARTICLE_PUBLICATION_YEAR,

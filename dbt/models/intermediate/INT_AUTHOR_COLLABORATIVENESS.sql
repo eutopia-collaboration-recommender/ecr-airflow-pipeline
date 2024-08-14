@@ -4,12 +4,12 @@ published by the author, the number of external collaborations, and the collabor
 is defined as the ratio of external collaborations to the total number of publications. The percentile of the
 collaboration rate is also calculated to determine the author's position in the distribution of collaboration rates.
 */
-WITH REF_STG_COLLABORATION AS (SELECT *
-                                       FROM {{ ref('STG_COLLABORATION') }}),
+WITH REF_ER_COLLABORATION AS (SELECT *
+                              FROM {{ ref('ER_COLLABORATION') }}),
      INITIAL_DATA AS (SELECT AUTHOR_SID,
                              COUNT(ARTICLE_SID)                                               AS PUBLICATIONS,
                              COUNT(DISTINCT IF(IS_EXTERNAL_COLLABORATION, ARTICLE_SID, NULL)) AS EXTERNAL_COLLABORATIONS
-                      FROM REF_STG_COLLABORATION
+                      FROM REF_ER_COLLABORATION
                       GROUP BY AUTHOR_SID),
      FILTERED_DATA AS (SELECT AUTHOR_SID,
                               PUBLICATIONS,

@@ -16,3 +16,9 @@ sources:
         description: ""
       - name: TEXT_EMBEDDING_ARTICLE
         description: ""
+      - name: AUTHOR_MATCH_CANDIDATE_PAIR_BY_ORCID
+        description: ""
+      - name: AUTHOR_MATCH_CANDIDATE_PAIR_BY_NEIGHBORHOOD
+        description: ""
+      - name: AUTHOR_MATCH_CONNECTED_COMPONENT_BY_NEIGHBORHOOD
+        description: ""

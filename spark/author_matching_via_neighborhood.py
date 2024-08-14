@@ -5,20 +5,28 @@ from pyspark.sql.functions import col, levenshtein
 # Define the job configuration
 JOB_CONFIG = {
     "APP_NAME": "AuthorMatchingViaNeighborhood",
-    "DATASET": "PROD",
+    "SOURCE_DATASET": "PROD",
+    "TARGET_DATASET": "ANALYTICS",
     "TARGET_TABLE": f"AUTHOR_MATCH_CANDIDATE_PAIR_BY_NEIGHBORHOOD",
-    "TEMPORARY_GCS_BUCKET": "ecr-dataproc-cluster-1",
-    "SAVE_MODE": "append",
+    "TEMPORARY_GCS_BUCKET": "ecr-composer-bucket-dataproc-temp",
+    "SAVE_MODE": "overwrite",
 }
 
 # Initialize Spark session
-spark = SparkSession.builder.appName("AuthorMatchingViaNeighborhood").getOrCreate()
+spark = (
+    SparkSession.builder.appName("AuthorMatchingViaNeighborhood")
+    .config(
+        "spark.jars.packages",
+        "com.google.cloud.spark:spark-bigquery-with-dependencies_2.12:0.24.2",
+    )
+    .getOrCreate()
+)
 
 
 # Load initial data from BigQuery with sampling
 author_neighborhood_df = (
     spark.read.format("bigquery")
-    .option("table", "PROD.STG_AUTHOR_NEIGHBORHOOD")
+    .option("table", f"{JOB_CONFIG['SOURCE_DATASET']}.STG_AUTHOR_NEIGHBORHOOD")
     .load()
     .select(
         col("INITIAL_AUTHOR_SID"),
@@ -62,5 +70,5 @@ author_match_df = result_df.filter(col("LEVENSHTEIN_DISTANCE") < 5)
 # Save to BigQuery table as the final result, which is saved to the dataset
 # and table specified in the JOB_CONFIG dictionary
 author_match_df.write.format("bigquery").mode(JOB_CONFIG["SAVE_MODE"]).option(
-    "table", f'{JOB_CONFIG["DATASET"]}.{JOB_CONFIG["TARGET_TABLE"]}'
+    "table", f'{JOB_CONFIG["TARGET_DATASET"]}.{JOB_CONFIG["TARGET_TABLE"]}'
 ).option("temporaryGcsBucket", JOB_CONFIG["TEMPORARY_GCS_BUCKET"]).save()

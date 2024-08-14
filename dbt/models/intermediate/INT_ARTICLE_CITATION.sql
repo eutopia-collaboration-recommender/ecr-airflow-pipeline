@@ -1,5 +1,5 @@
-WITH REF_STG_COLLABORATION AS (SELECT *
-                                       FROM {{ ref("STG_COLLABORATION") }}),
+WITH REF_ER_COLLABORATION AS (SELECT *
+                              FROM {{ ref("ER_COLLABORATION") }}),
      DISTINCT_INSTITUTION_CITATIONS AS (SELECT DISTINCT ARTICLE_SID
                                                       , INSTITUTION_SID
                                                       , FIRST_VALUE(AUTHOR_SID)
@@ -7,7 +7,7 @@ WITH REF_STG_COLLABORATION AS (SELECT *
                                                                         (PARTITION BY ARTICLE_SID, INSTITUTION_SID ORDER BY IS_REFERENCED_BY_COUNT DESC) AS AUTHOR_SID
                                                       , MAX(IS_REFERENCED_BY_COUNT)
                                                             OVER (PARTITION BY ARTICLE_SID, INSTITUTION_SID ORDER BY IS_REFERENCED_BY_COUNT DESC)        AS INSTITUTION_CITATION_COUNT
-                                        FROM REF_STG_COLLABORATION)
+                                        FROM REF_ER_COLLABORATION)
 SELECT C.AUTHOR_SID,
        C.ARTICLE_SID,
        C.INSTITUTION_SID,
@@ -19,7 +19,7 @@ SELECT C.AUTHOR_SID,
        IFNULL(D.INSTITUTION_CITATION_COUNT, 0)            AS INSTITUTION_CITATION_COUNT,
        -- The number of times the author has been cited by other articles. This field is always filled.
        IFNULL(C.IS_REFERENCED_BY_COUNT, 0)                AS AUTHOR_CITATION_COUNT
-FROM REF_STG_COLLABORATION C
+FROM REF_ER_COLLABORATION C
          LEFT JOIN DISTINCT_INSTITUTION_CITATIONS D
                    ON C.ARTICLE_SID = D.ARTICLE_SID
                        AND C.INSTITUTION_SID = D.INSTITUTION_SID

@@ -2,7 +2,9 @@ WITH SOURCE_TABLE
          AS (SELECT ORCID_ID,
                     JSON
              FROM {{ source('AIRFLOW', 'ORCID_API_AUTHOR') }})
-SELECT ORCID_ID                                                   AS MEMBER_ORCID_ID
+SELECT JSON_EXTRACT_SCALAR(
+        JSON, '$.orcid-identifier.path'
+       )                                                          AS MEMBER_ORCID_ID
      , JSON_EXTRACT_SCALAR(
         JSON, '$.person.name.given-names.value'
        )                                                          AS MEMBER_GIVEN_NAME

@@ -79,6 +79,7 @@ def query_article_embeddings_batch(
 ) -> pd.DataFrame:
     """
     Query the number of articles for which the research area is missing.
+    :param batch_size: Batch size.
     :param bq_client: The BigQuery client.
     :param source_table_id: Source table ID.
     :param target_table_id: Target table ID.

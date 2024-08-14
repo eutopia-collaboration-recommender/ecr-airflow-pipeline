@@ -1,0 +1,29 @@
+WITH CNI_COLLABORATION AS (SELECT ARTICLE_SID,
+                                  ARTICLE_PUBLICATION_DT,
+                                  AUTHOR_SID
+                           FROM {{ ref('ER_COLLABORATION') }}
+                           WHERE AUTHOR_SID <> 'n/a'
+                             AND INSTITUTION_SID <> 'n/a'
+                             AND NOT IS_SOLE_AUTHOR_PUBLICATION),
+     CNI_AUTHOR_PAIR
+         AS (SELECT C.ARTICLE_SID,
+                    C.ARTICLE_PUBLICATION_DT,
+                    C.AUTHOR_SID,
+                    C2.AUTHOR_SID AS COLLABORATOR_AUTHOR_SID,
+             FROM CNI_COLLABORATION C
+                      LEFT JOIN CNI_COLLABORATION C2
+                                ON C.ARTICLE_SID = C2.ARTICLE_SID
+                                    AND C.AUTHOR_SID <> C2.AUTHOR_SID)
+SELECT AP1.ARTICLE_SID,
+       AP1.AUTHOR_SID,
+       AP1.COLLABORATOR_AUTHOR_SID,
+       COUNT(DISTINCT AP2.ARTICLE_SID) AS PRIOR_COLLABORATION_COUNT
+FROM CNI_AUTHOR_PAIR AP1
+         LEFT JOIN CNI_AUTHOR_PAIR AP2
+                   ON AP1.AUTHOR_SID = AP2.AUTHOR_SID
+                       AND AP1.COLLABORATOR_AUTHOR_SID = AP2.COLLABORATOR_AUTHOR_SID
+                       AND AP1.ARTICLE_PUBLICATION_DT > AP2.ARTICLE_PUBLICATION_DT
+GROUP BY AP1.ARTICLE_SID,
+         AP1.AUTHOR_SID,
+         AP1.COLLABORATOR_AUTHOR_SID
+

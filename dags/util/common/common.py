@@ -3,7 +3,9 @@ import logging
 import backoff
 import pandas as pd
 import requests
+from google.auth import default
 from google.cloud import bigquery, secretmanager
+from googleapiclient.discovery import build
 
 MAILTO_EMAIL = "luka.zontar.consulting@gmail.com"
 
@@ -133,6 +135,7 @@ def get_secret(
 ) -> str:
     """
     Fetch the secret from Secret Manager
+    :rtype: object
     :param project_id: Project ID
     :param name: Secret name
     :param version: Secret version
@@ -142,3 +145,34 @@ def get_secret(
     return client.access_secret_version(
         name=f"projects/{project_id}/secrets/{name}/versions/{version}"
     ).payload.data.decode("UTF-8")
+
+
+def get_sheet_data(spreadsheet_id: str, sheet_id: str, data_range: str) -> pd.DataFrame:
+    """
+    Get data from a Google Sheet.
+    :param spreadsheet_id: The ID of the Google Sheet
+    :param sheet_id: The name of the sheet
+    :param data_range: The range of data to retrieve
+    :return: DataFrame with the data
+    """
+    scopes = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+    # Get credentials and project from the environment
+    creds, project = default(scopes=scopes)
+    # Build the service to interact with Google Sheets
+    service = build("sheets", "v4", credentials=creds)
+
+    # Define the range of data to retrieve (e.g., entire sheet)
+    range_name = f"{sheet_id}!{data_range}"
+
+    # Call the Sheets API to fetch the data
+    result = (
+        service.spreadsheets()
+        .values()
+        .get(spreadsheetId=spreadsheet_id, range=range_name)
+        .execute()
+    )
+
+    # Extract the data
+    values = result.get("values")
+    columns = values.pop(0)
+    return pd.DataFrame(values, columns=columns)

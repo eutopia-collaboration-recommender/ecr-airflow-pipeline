@@ -2,21 +2,21 @@
 Collaboration duration is defined as the maximum number of articles published by the same pair of authors before the
 current article. It is used to measure how long before the current article the authors collaborated.
 */
-WITH REF_STG_COLLABORATION AS (SELECT ARTICLE_SID,
-                                              AUTHOR_SID,
-                                              ARTICLE_PUBLICATION_DT
-                                       FROM {{ ref("STG_COLLABORATION") }}
-                                       WHERE IS_EUTOPIAN_PUBLICATION),
+WITH REF_ER_COLLABORATION AS (SELECT ARTICLE_SID,
+                                     AUTHOR_SID,
+                                     ARTICLE_PUBLICATION_DT
+                              FROM {{ ref("ER_COLLABORATION") }}
+                              WHERE IS_EUTOPIAN_PUBLICATION),
      AUTHOR_COUNT AS (SELECT ARTICLE_SID,
                              COUNT(DISTINCT AUTHOR_SID) AS AUTHOR_COUNT
-                      FROM REF_STG_COLLABORATION
+                      FROM REF_ER_COLLABORATION
                       GROUP BY ARTICLE_SID),
      AUTHOR_PAIRS AS (SELECT A1.ARTICLE_SID,
                              A1.AUTHOR_SID AS AUTHOR_SID_1,
                              A2.AUTHOR_SID AS AUTHOR_SID_2,
                              A1.ARTICLE_PUBLICATION_DT
-                      FROM REF_STG_COLLABORATION A1
-                               INNER JOIN REF_STG_COLLABORATION A2 ON A1.ARTICLE_SID = A2.ARTICLE_SID
+                      FROM REF_ER_COLLABORATION A1
+                               INNER JOIN REF_ER_COLLABORATION A2 ON A1.ARTICLE_SID = A2.ARTICLE_SID
                       WHERE A1.AUTHOR_SID <> A2.AUTHOR_SID),
      COLLABORATION_LENGTH AS (SELECT AP1.AUTHOR_SID_1,
                                      AP1.AUTHOR_SID_2,

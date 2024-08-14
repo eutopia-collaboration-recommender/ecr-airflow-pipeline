@@ -2,9 +2,8 @@ import json
 import time
 
 import requests
-from google.cloud import bigquery, secretmanager
+from google.cloud import bigquery
 from requests.exceptions import ChunkedEncodingError
-from util.common import get_secret
 
 
 def query_dois(
@@ -146,20 +145,14 @@ def fetch_orcid_id(orcid_id: str, access_token: str, request_limit_queue: list) 
     return record
 
 
-def fetch_access_token(project_id) -> str:
+def fetch_access_token(project_id: str, client_id: str, client_secret: str) -> str:
     """
     Fetch the access token from ORCID (based on the client ID and client secret that are stored in Secret Manager)
+    :param client_secret: Client secret
+    :param client_id: Client ID
     :param project_id: Project ID
     :return: Access token
     """
-    # Create the Secret Manager client.
-    client = secretmanager.SecretManagerServiceClient()
-    client_id = get_secret(
-        project_id=project_id, name="ORCID_CLIENT_ID", version="1", client=client
-    )
-    client_secret = get_secret(
-        project_id=project_id, name="ORCID_CLIENT_SECRET", version="1", client=client
-    )
 
     # Define headers
     headers_token: dict = {"Accept": "application/json"}

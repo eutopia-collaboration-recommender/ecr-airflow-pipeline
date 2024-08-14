@@ -4,7 +4,9 @@ WITH SOURCE_TABLE
              FROM {{ source('AIRFLOW', 'ORCID_API_AUTHOR') }})
         ,
      API_ORCID_ARTICLE_JSON
-         AS (SELECT ORCID_ID                                                              AS ORCID_ID
+         AS (SELECT JSON_EXTRACT_SCALAR(
+             JSON, '$.orcid-identifier.path'
+                    )                                                                     AS ORCID_ID
                   , WORK                                                                  AS WORK_JSON
                   , IFNULL(WORK_SUMMARY, JSON_EXTRACT(WORK, '$.work-summary'))            AS WORK_SUMMARY_JSON
                   , IFNULL(EXTERNAL_ID, JSON_EXTRACT(WORK, '$.external-ids.external-id')) AS EXTERNAL_ID_JSON

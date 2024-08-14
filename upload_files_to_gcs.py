@@ -91,7 +91,11 @@ def upload_folder(bucket: storage.Bucket, source_folder: str, destination_folder
             # Calculate the local file's MD5 hash
             file_md5_hash = get_md5_hash(source_file_path)
 
-            if file in blobs_md5_dict.keys() and blobs_md5_dict[file] == file_md5_hash:
+            if (
+                file in blobs_md5_dict.keys()
+                and blobs_md5_dict[file] == file_md5_hash
+                and file != "__init__.py"
+            ):
                 continue
 
             # Preserve the folder structure by creating the destination path

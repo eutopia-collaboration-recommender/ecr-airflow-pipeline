@@ -1,10 +1,10 @@
-WITH REF_STG_COLLABORATION AS (SELECT * FROM {{ ref("STG_COLLABORATION") }})
+WITH REF_ER_COLLABORATION AS (SELECT * FROM {{ ref("ER_COLLABORATION") }})
    , REF_INT_ARTICLE_RESEARCH_AREA AS (SELECT * FROM {{ ref("INT_ARTICLE_RESEARCH_AREA") }})
    , ARTICLE_COLLABORATION_WITH_TOPIC AS (SELECT C.ARTICLE_SID,
                                                  C.AUTHOR_SID,
                                                  T.RESEARCH_AREA_SID,
                                                  C.ARTICLE_PUBLICATION_DT
-                                          FROM REF_STG_COLLABORATION C
+                                          FROM REF_ER_COLLABORATION C
                                                    LEFT JOIN REF_INT_ARTICLE_RESEARCH_AREA T USING (ARTICLE_SID)
                                           WHERE NOT C.IS_SOLE_AUTHOR_PUBLICATION)
    , ARTICLE_RESEARCH_AREA_EXPERIENCE_BY_AUTHOR_AND_ARTICLE

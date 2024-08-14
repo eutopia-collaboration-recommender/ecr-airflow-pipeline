@@ -8,7 +8,7 @@ NOTE: author experience for external authors is not calculated properly in this 
 dataset of all the articles published by external authors that only collaborate with EUTOPIA authors.
 */
 WITH REF_STG_CROSSREF_HISTORIC_ARTICLE AS (SELECT DISTINCT AUTHOR_SID, ARTICLE_SID, ARTICLE_PUBLICATION_DT
-                                           FROM {{ ref("STG_COLLABORATION") }}),
+                                           FROM {{ ref("ER_COLLABORATION") }}),
      REF_STG_CROSSREF_AUTHOR AS (SELECT DISTINCT AUTHOR_SID,
                                                  AUTHOR_ORCID_ID
                                  FROM {{ ref("STG_CROSSREF_AUTHOR") }}),
@@ -17,12 +17,13 @@ WITH REF_STG_CROSSREF_HISTORIC_ARTICLE AS (SELECT DISTINCT AUTHOR_SID, ARTICLE_S
                                       O.ARTICLE_PUBLICATION_DT
                                FROM {{ref('STG_ORCID_ARTICLE')}} O
                                         LEFT JOIN REF_STG_CROSSREF_AUTHOR A
-                                                  ON O.MEMBER_ORCID_ID = A.AUTHOR_ORCID_ID),
+                                                  ON O.ORCID_ID = A.AUTHOR_ORCID_ID),
      -- Calculate the number of EUTOPIA articles published by the author prior to the current publication
      INT_AUTHOR_EXPERIENCE_CROSSREF AS (SELECT A.AUTHOR_SID,
                                                A.ARTICLE_SID,
                                                A.ARTICLE_PUBLICATION_DT,
-                                               COUNT(A.ARTICLE_SID) OVER (PARTITION BY A.AUTHOR_SID ORDER BY A.ARTICLE_PUBLICATION_DT ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) AS PREVIOUS_EUTOPIA_ARTICLE_COUNT
+                                               COUNT(A.ARTICLE_SID)
+                                                     OVER (PARTITION BY A.AUTHOR_SID ORDER BY A.ARTICLE_PUBLICATION_DT ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING) AS PREVIOUS_EUTOPIA_ARTICLE_COUNT
                                         FROM REF_STG_CROSSREF_HISTORIC_ARTICLE A),
      -- Calculate the number of total articles published by the author prior to the current publication
      -- Mainly focus on EUTOPIA authors
